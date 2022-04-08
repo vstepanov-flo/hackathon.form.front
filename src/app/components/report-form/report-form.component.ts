@@ -2,7 +2,8 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NbTagComponent, NbTagInputDirective } from '@nebular/theme';
-import { Observable, of } from 'rxjs';
+import { lastValueFrom, Observable, of } from 'rxjs';
+import { ApiService } from '../../shared/services/api.service';
 
 @Component({
   selector: 'app-report-form',
@@ -32,8 +33,15 @@ export class ReportFormComponent implements OnInit {
 
   reportType: string = 'feedback';
 
-  city: string[];
-  filteredControlOptions$: Observable<string[]>;
+  //TODO change type
+  city: any = [];
+  cityInfo: any;
+  mappedCityInfo: any = {};
+  selectedCity: any;
+  filteredCityOptions$: Observable<string[]>;
+
+  institution: string[];
+  filteredInstitutionOptions$: Observable<string[]>;
 
   public reportForm: FormGroup = new FormGroup({
     email: new FormControl('',  [Validators.required, Validators.email]),
@@ -51,15 +59,53 @@ export class ReportFormComponent implements OnInit {
     file: new FormControl('',  []),
   });
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private apiService: ApiService,
+  ) { }
 
-  ngOnInit(): void {
-    this.city = ['Краснодар'];
-    this.filteredControlOptions$ = of(this.city);
+  async ngOnInit(): Promise<void> {
+    const { city: clientCity } = await lastValueFrom(of({ city: 'Krasnodar' }));
+    this.cityInfo = await lastValueFrom(of({
+      Krasnodar: {
+        name: 'Краснодар',
+        institution: ['Краснодар ул. Ставропольская'],
+      },
+      Anapa: {
+        name: 'Анапа',
+        institution: ['Анапа ул. Ставропольская'],
+      }
+    }));
 
-    this.reportForm.valueChanges.subscribe(({ city }) => {
-      this.filteredControlOptions$ = of(this.city.filter(value => {
+    for (const city in this.cityInfo) {
+      this.city.push(this.cityInfo[city].name)
+      if (clientCity) {
+        this.selectedCity = this.cityInfo[clientCity];
+        this.institution = this.cityInfo[clientCity].institution;
+        this.filteredInstitutionOptions$ = of(this.institution);
+        this.reportForm.patchValue({ city: this.cityInfo[clientCity].name });
+      }
+      this.mappedCityInfo[this.cityInfo[city].name] = this.cityInfo[city];
+    }
+
+    this.filteredCityOptions$ = of(this.city);
+
+    this.reportForm.get('city')!.valueChanges.subscribe((city) => {
+      //TODO change type
+      this.selectedCity = this.mappedCityInfo[city];
+      if (this.selectedCity) {
+        this.filteredInstitutionOptions$ = of(this.selectedCity.institution);
+        this.institution = this.selectedCity.institution;
+      }
+      this.filteredCityOptions$ = of(this.city.filter((value: any) => {
         const filterValue = city.toLowerCase();
+        return value.toLowerCase().includes(filterValue);
+      }))
+    });
+
+    this.reportForm.get('institution')!.valueChanges.subscribe((institution) => {
+      this.filteredInstitutionOptions$ = of(this.institution.filter(value => {
+        const filterValue = institution.toLowerCase();
         return value.toLowerCase().includes(filterValue);
       }))
     });
