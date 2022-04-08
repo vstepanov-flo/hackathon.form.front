@@ -1,0 +1,67 @@
+<nb-card>
+  <nb-card-header>Заявка</nb-card-header>
+  <nb-card-body>
+    <form [formGroup]="reportForm">
+
+      <nb-select fullWidth placeholder="Тип обращения" formControlName="reportType" [(selected)]="reportType">
+        <nb-option [value]="'complaint'">Жалоба</nb-option>
+        <nb-option [value]="'feedback'">Отзыв</nb-option>
+      </nb-select>
+
+      <nb-form-field>
+        <nb-icon nbPrefix icon="pricetags-outline" pack="eva"></nb-icon>
+        <nb-tag-list (tagRemove)="onTagRemove($event, reportType)">
+          <nb-tag *ngFor="let tag of tags" [text]="tag" removable></nb-tag>
+          <input placeholder="Теги" fullWidth type="text" nbTagInput (tagAdd)="onTagAdd($event.value, reportType)" [nbAutocomplete]="autocomplete">
+        </nb-tag-list>
+
+      </nb-form-field>
+      <nb-autocomplete #autocomplete (selectedChange)="onTagAdd($event, reportType)">
+        <nb-option *ngFor="let option of options[reportType]" [value]="option">{{ option }}</nb-option>
+      </nb-autocomplete>
+
+      <nb-form-field>
+        <nb-icon nbPrefix icon="home-outline" pack="eva"></nb-icon>
+        <input fullWidth type="text" nbInput formControlName="city" placeholder="Город">
+      </nb-form-field>
+
+      <nb-form-field>
+        <!--    <nb-icon nbPrefix icon="at-outline" pack="eva"></nb-icon>-->
+        <input fullWidth type="text" nbInput formControlName="institution" placeholder="Учереждение">
+      </nb-form-field>
+
+      <nb-form-field>
+        <!--    <nb-icon nbPrefix icon="at-outline" pack="eva"></nb-icon>-->
+        <input fullWidth type="text" nbInput formControlName="name" placeholder="Имя">
+      </nb-form-field>
+
+      <nb-form-field>
+        <!--    <nb-icon nbPrefix icon="at-outline" pack="eva"></nb-icon>-->
+        <input fullWidth type="text" nbInput formControlName="surname" placeholder="Фамилия">
+      </nb-form-field>
+
+      <nb-form-field>
+        <!--    <nb-icon nbPrefix icon="at-outline" pack="eva"></nb-icon>-->
+        <input fullWidth type="text" nbInput formControlName="patronymic" placeholder="Отчество">
+      </nb-form-field>
+
+      <nb-form-field>
+            <nb-icon nbPrefix icon="file-text-outline" pack="eva"></nb-icon>
+        <textarea fullWidth fieldSize="giant" type="textarea" nbInput formControlName="reportText" placeholder="Текст обращения"></textarea>
+      </nb-form-field>
+
+      <nb-form-field>
+<!--        <nb-icon nbPrefix icon="at-outline" pack="eva"></nb-icon>-->
+        <input fullWidth type="file" nbInput formControlName="file" placeholder="Файл для отправки">
+      </nb-form-field>
+
+      <nb-form-field>
+        <nb-icon nbPrefix icon="at-outline" pack="eva"></nb-icon>
+        <input fullWidth type="text" nbInput formControlName="email" placeholder="Email">
+      </nb-form-field>
+
+      <button (click)="onSubmit()" status="success" nbButton [disabled]="reportForm.invalid || tags.size < 1 || tags.size > 5">Отпрвить</button>
+    </form>
+
+  </nb-card-body>
+</nb-card>

@@ -1,0 +1,22 @@
+nb-card {
+  width: 50%;
+  margin: auto;
+
+  @media (max-width: 768.98px) {
+    width: 90%;
+  }
+
+  nb-card-header {
+    text-align: center;
+  }
+
+  nb-form-field {
+    margin: 1rem 0;
+  }
+
+  //ng-card-body {
+  //  form {
+  //    justify-content: center;
+  //  }
+  //}
+}
