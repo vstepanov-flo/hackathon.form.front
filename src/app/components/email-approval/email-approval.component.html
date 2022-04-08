@@ -1,0 +1,16 @@
+<nb-card>
+  <nb-card-header>Подтверждение почты</nb-card-header>
+  <nb-card-body>
+
+    <form [formGroup]="emailVerifyForm">
+
+      <nb-form-field>
+        <nb-icon nbPrefix icon="hash-outline" pack="eva"></nb-icon>
+        <input fullWidth type="text" nbInput formControlName="code" placeholder="Код">
+      </nb-form-field>
+
+      <button (click)="onSendCode()" status="success" nbButton [disabled]="emailVerifyForm.invalid">Отпрвить</button>
+    </form>
+
+  </nb-card-body>
+</nb-card>
