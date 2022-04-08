@@ -16,12 +16,14 @@ import {
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { ReportFormComponent } from './components/report-form/report-form.component';
 import { EmailApprovalComponent } from './components/email-approval/email-approval.component';
+import { SuccessPageComponent } from './components/success-page/success-page.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ReportFormComponent,
-    EmailApprovalComponent
+    EmailApprovalComponent,
+    SuccessPageComponent,
   ],
   imports: [
     BrowserModule,
