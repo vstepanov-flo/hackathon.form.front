@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NbTagComponent, NbTagInputDirective } from '@nebular/theme';
+import { Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-report-form',
@@ -9,7 +10,8 @@ import { NbTagComponent, NbTagInputDirective } from '@nebular/theme';
   styleUrls: ['./report-form.component.scss']
 })
 export class ReportFormComponent implements OnInit {
-
+  // @ts-ignore
+  @ViewChild(NbTagInputDirective, { read: ElementRef }) tagInput: ElementRef<HTMLInputElement>;
   fields: string[] = [
     'email',
     'city',
@@ -22,7 +24,6 @@ export class ReportFormComponent implements OnInit {
     'reportText',
     'file',
   ];
-
   tags: Set<string> = new Set<string>();
   options: {[k:string]: string[]} = {
     complaint: this.fields,
@@ -31,8 +32,8 @@ export class ReportFormComponent implements OnInit {
 
   reportType: string = 'feedback';
 
-  // @ts-ignore
-  @ViewChild(NbTagInputDirective, { read: ElementRef }) tagInput: ElementRef<HTMLInputElement>;
+  city: string[];
+  filteredControlOptions$: Observable<string[]>;
 
   public reportForm: FormGroup = new FormGroup({
     email: new FormControl('',  [Validators.required, Validators.email]),
@@ -53,6 +54,15 @@ export class ReportFormComponent implements OnInit {
   constructor(private router: Router) { }
 
   ngOnInit(): void {
+    this.city = ['Краснодар'];
+    this.filteredControlOptions$ = of(this.city);
+
+    this.reportForm.valueChanges.subscribe(({ city }) => {
+      this.filteredControlOptions$ = of(this.city.filter(value => {
+        const filterValue = city.toLowerCase();
+        return value.toLowerCase().includes(filterValue);
+      }))
+    });
   }
 
   onTagRemove(tagToRemove: NbTagComponent, tagsBlock: string): void {
@@ -73,5 +83,4 @@ export class ReportFormComponent implements OnInit {
     console.log(this.reportForm.value);
     this.router.navigate(['/email-verify']).then();
   }
-
 }

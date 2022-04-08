@@ -20,10 +20,21 @@
         <nb-option *ngFor="let option of options[reportType]" [value]="option">{{ option }}</nb-option>
       </nb-autocomplete>
 
-      <nb-form-field>
-        <nb-icon nbPrefix icon="home-outline" pack="eva"></nb-icon>
-        <input fullWidth type="text" nbInput formControlName="city" placeholder="Город">
-      </nb-form-field>
+      <input
+        formControlName="city"
+        fullWidth
+        nbInput
+        type="text"
+        placeholder="Form control"
+        [nbAutocomplete]="autoControl" />
+
+      <nb-autocomplete #autoControl>
+
+        <nb-option *ngFor="let option of filteredControlOptions$ | async" [value]="option">
+          {{ option }}
+        </nb-option>
+
+      </nb-autocomplete>
 
       <nb-form-field>
         <!--    <nb-icon nbPrefix icon="at-outline" pack="eva"></nb-icon>-->
