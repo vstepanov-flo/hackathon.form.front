@@ -3,7 +3,8 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  ipgeolocationApiKey: '6afebe20a77848e996c1e31deac91dfe'
 };
 
 /*
