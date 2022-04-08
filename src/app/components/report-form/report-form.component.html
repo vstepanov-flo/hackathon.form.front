@@ -18,7 +18,7 @@
 
       </nb-form-field>
       <nb-autocomplete #autocomplete (selectedChange)="onTagAdd($event, reportType)">
-        <nb-option *ngFor="let option of options[reportType]" [value]="option">{{ option }}</nb-option>
+        <nb-option *ngFor="let option of optionsTags[reportType]" [value]="option">{{ option }}</nb-option>
       </nb-autocomplete>
 
       <nb-form-field>

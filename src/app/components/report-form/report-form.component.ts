@@ -26,10 +26,7 @@ export class ReportFormComponent implements OnInit {
     'file',
   ];
   tags: Set<string> = new Set<string>();
-  options: {[k:string]: string[]} = {
-    complaint: this.fields,
-    feedback: ['1','2','3'],
-  }
+  optionsTags: {[k:string]: string[]}
 
   reportType: string = 'feedback';
 
@@ -76,6 +73,10 @@ export class ReportFormComponent implements OnInit {
         institution: ['Анапа ул. Ставропольская'],
       }
     }));
+    this.optionsTags = await lastValueFrom(of({
+      complaint: ['3','2','1'],
+      feedback: ['1','2','3'],
+    }))
 
     for (const city in this.cityInfo) {
       this.city.push(this.cityInfo[city].name)
@@ -109,17 +110,21 @@ export class ReportFormComponent implements OnInit {
         return value.toLowerCase().includes(filterValue);
       }))
     });
+
+    this.reportForm.get('reportType')!.valueChanges.subscribe((tags) => {
+      this.tags.clear();
+    })
   }
 
   onTagRemove(tagToRemove: NbTagComponent, tagsBlock: string): void {
     this.tags.delete(tagToRemove.text);
-    this.options[tagsBlock].push(tagToRemove.text);
+    this.optionsTags[tagsBlock].push(tagToRemove.text);
   }
 
   onTagAdd(value: string, tagsBlock: string): void {
-    if (value && this.options[tagsBlock].includes(value)) {
+    if (value && this.optionsTags[tagsBlock].includes(value)) {
       this.tags.add(value);
-      this.options[tagsBlock] = this.options[tagsBlock].filter(o => o !== value);
+      this.optionsTags[tagsBlock] = this.optionsTags[tagsBlock].filter(o => o !== value);
     }
     this.tagInput.nativeElement.value = '';
   }
