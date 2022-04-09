@@ -1,3 +1,4 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -56,6 +57,7 @@ export class EmailApprovalComponent extends UnsubscribeComponent implements OnIn
 
   onSendCode(): void {
     const code = this.emailVerifyForm.value.code;
+    console.log(this.form, this.file);
     this.apiService.sendVerifyCode(code)
       .pipe(
         tap(async () => {
@@ -71,6 +73,8 @@ export class EmailApprovalComponent extends UnsubscribeComponent implements OnIn
         }),
         catchError((error) => {
           this.toastrService.showError(error);
+          //TODO remove in prod
+          // this.router.navigate(['/success']).then();
           return of(error);
         })
       )
