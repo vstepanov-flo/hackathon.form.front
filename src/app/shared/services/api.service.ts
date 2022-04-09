@@ -30,6 +30,10 @@ export class ApiService {
     return this.#post('http://123', { code });
   }
 
+  public sendReport(body: ObjectType): Observable<void> {
+    return this.#post('http://321', body);
+  }
+
   #get<T>(url:string, params?: ObjectType): Observable<T> {
     return this.httpClient.get<T>(url, {
       params
