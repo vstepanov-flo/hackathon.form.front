@@ -20,7 +20,7 @@ export function errorHandler(err: HttpErrorResponse): ErrorHandlerResponse {
       response.body = 'CORS ошибка, обратитесь к Администратору';
       break;
     case 401:
-      response.body = 'Ошибка автоизации';
+      response.body = 'Ошибка автоизации. Код не совпадает';
       break;
     case 429:
       response.body = 'Лимит запросов на сервер превышен';
