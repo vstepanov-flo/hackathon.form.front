@@ -14,8 +14,20 @@ export class ApiService {
 
   constructor(private httpClient: HttpClient) { }
 
-  public getCity(): Observable<any> {
+  public getClientIpInfo(): Observable<any> {
     return this.#get('https://api.ipgeolocation.io/ipgeo', { apiKey: environment.ipgeolocationApiKey });
+  }
+
+  public getCityInfo(): Observable<any> {
+    return this.#get('')
+  }
+
+  public getCodeForEmailVerify(email: string): Observable<void> {
+    return this.#post('http://ipinfo.io/', { email })
+  }
+
+  public sendVerifyCode(code: string): Observable<void> {
+    return this.#post('http://123', { code });
   }
 
   #get<T>(url:string, params?: ObjectType): Observable<T> {
