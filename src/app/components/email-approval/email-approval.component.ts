@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, of, tap } from 'rxjs';
+import { catchError, lastValueFrom, of, takeUntil, tap } from 'rxjs';
+import { UnsubscribeComponent } from '../../shared/components/unsubscribe/unsubscribe.component';
 import { ApiService } from '../../shared/services/api.service';
 import { ToastrService } from '../../shared/services/toastr.service';
 
@@ -10,7 +11,7 @@ import { ToastrService } from '../../shared/services/toastr.service';
   templateUrl: './email-approval.component.html',
   styleUrls: ['./email-approval.component.scss'],
 })
-export class EmailApprovalComponent implements OnInit {
+export class EmailApprovalComponent extends UnsubscribeComponent implements OnInit {
 
   public emailVerifyForm: FormGroup = new FormGroup({
     code: new FormControl('', [
