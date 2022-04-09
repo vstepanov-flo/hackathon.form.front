@@ -4,6 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, lastValueFrom, of, takeUntil, tap } from 'rxjs';
 import { UnsubscribeComponent } from '../../shared/components/unsubscribe/unsubscribe.component';
 import { ApiService } from '../../shared/services/api.service';
+import { BehaviorSubjectService } from '../../shared/services/behavior-subject.service';
 import { ToastrService } from '../../shared/services/toastr.service';
 
 @Component({
@@ -25,7 +26,9 @@ export class EmailApprovalComponent extends UnsubscribeComponent implements OnIn
     private route: ActivatedRoute,
     private apiService: ApiService,
     private toastrService: ToastrService,
+    private behaviourSubject: BehaviorSubjectService,
   ) {
+    super();
   }
 
   ngOnInit(): void {
@@ -40,7 +43,13 @@ export class EmailApprovalComponent extends UnsubscribeComponent implements OnIn
     const code = this.emailVerifyForm.value.code;
     this.apiService.sendVerifyCode(code)
       .pipe(
-        tap(() => {
+        tap(async () => {
+          // await lastValueFrom(this.apiService.sendReport())
+          this.behaviourSubject.selectedRequests
+            .pipe(takeUntil(this.unsubscribe))
+            .subscribe((form) => {
+              lastValueFrom(this.apiService.sendReport(form)).then();
+            })
           this.router.navigate(['/success']).then();
         }),
         catchError((error) => {

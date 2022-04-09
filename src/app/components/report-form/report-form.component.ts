@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { NbTagComponent, NbTagInputDirective } from '@nebular/theme';
 import { lastValueFrom, Observable, of } from 'rxjs';
 import { ApiService } from '../../shared/services/api.service';
+import { BehaviorSubjectService } from '../../shared/services/behavior-subject.service';
 
 @Component({
   selector: 'app-report-form',
@@ -59,6 +60,7 @@ export class ReportFormComponent implements OnInit {
   constructor(
     private router: Router,
     private apiService: ApiService,
+    private behaviourService: BehaviorSubjectService,
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -131,7 +133,10 @@ export class ReportFormComponent implements OnInit {
 
   onSubmit(): void {
     this.reportForm.patchValue({ tags: [...this.tags]})
+    this.behaviourService.selectRequest(this.reportForm.value);
     console.log(this.reportForm.value);
-    this.router.navigate(['/email-verify'], { queryParams: { email: this.reportForm.value.email } }).then();
+    this.router.navigate(['/email-verify'], {
+      queryParams: { email: this.reportForm.value.email },
+    }).then();
   }
 }
