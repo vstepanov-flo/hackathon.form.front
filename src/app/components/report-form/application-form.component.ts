@@ -7,21 +7,13 @@ import { UnsubscribeComponent } from '../../shared/components/unsubscribe/unsubs
 import { ApiService } from '../../shared/services/api.service';
 import { BehaviorSubjectService } from '../../shared/services/behavior-subject.service';
 import { FormGroupsService } from '../../shared/services/form-groups.service';
+import { OrganizationCacheService } from '../../shared/services/organization-cache.service';
 
 export type OptionsTags = {
   [k: string]: string[];
 };
 
 export type ApplicationType = 'complaint' | 'gratitude' | 'suggestion' | 'question';
-
-export interface CitiesInfo {
-  [k: string]: CityInfo;
-}
-
-export interface CityInfo {
-  name: string;
-  institution: string[];
-}
 
 @Component({
   selector: 'app-application-form',
@@ -36,9 +28,11 @@ export class ApplicationFormComponent extends UnsubscribeComponent implements On
 
   selectedApplicationType: ApplicationType = 'complaint';
 
-  city: string[] = [];
-  mappedCitiesInfo: CitiesInfo = {};
-  selectedCity: CityInfo;
+  cities: string[] = [];
+  selectedCity: {
+    city: string;
+    organizations: string[];
+  };
   filteredCitiesOptions$: Observable<string[]>;
 
   institution: string[];
@@ -53,47 +47,31 @@ export class ApplicationFormComponent extends UnsubscribeComponent implements On
     private apiService: ApiService,
     private behaviourService: BehaviorSubjectService,
     private formGroupService: FormGroupsService,
+    private organizationsService: OrganizationCacheService,
   ) {
     super();
   }
-
+  //TODO Unmock request
   async ngOnInit(): Promise<void> {
-    const { city: clientCity } = await lastValueFrom(of({ city: 'Krasnodar' }));
-    const citiesInfo: CitiesInfo = await lastValueFrom(of({
-      Krasnodar: {
-        name: 'Краснодар',
-        institution: ['Краснодар ул. Ставропольская'],
-      },
-      Anapa: {
-        name: 'Анапа',
-        institution: ['Анапа ул. Ставропольская'],
-      }
-    }));
+    // const { city: clientCity } = await lastValueFrom(of({ city: 'Krasnodar' }));
+    await this.organizationsService.setOrganizationsCitiesInfo();
+    this.cities = this.#getCities();
+
     this.optionsTags = await lastValueFrom(of({
       complaint: ['3','2','1'],
     }))
 
-    for (const city in citiesInfo) {
-      this.city.push(citiesInfo[city].name)
-      if (clientCity) {
-        this.selectedCity = citiesInfo[clientCity];
-        this.institution = citiesInfo[clientCity].institution;
-        this.filteredInstitutionsOptions$ = of(this.institution);
-        this.applicationForm.patchValue({ city: citiesInfo[clientCity].name });
-      }
-      this.mappedCitiesInfo[citiesInfo[city].name] = citiesInfo[city];
-    }
-
-    this.filteredCitiesOptions$ = of(this.city);
+    this.filteredCitiesOptions$ = of(this.cities);
 
     this.applicationForm.get('city')!.valueChanges.subscribe((city) => {
-      //TODO change type
-      this.selectedCity = this.mappedCitiesInfo[city];
-      if (this.selectedCity) {
-        this.filteredInstitutionsOptions$ = of(this.selectedCity.institution);
-        this.institution = this.selectedCity.institution;
-      }
-      this.filteredCitiesOptions$ = of(this.city.filter((value: any) => {
+      this.selectedCity = {
+        city,
+        organizations: this.#getOrganizationsByCity(city),
+      };
+      this.filteredInstitutionsOptions$ = of(this.selectedCity.organizations);
+      this.institution = this.selectedCity.organizations;
+
+      this.filteredCitiesOptions$ = of(this.cities.filter((value: any) => {
         const filterValue = city.toLowerCase();
         return value.toLowerCase().includes(filterValue);
       }))
@@ -151,8 +129,6 @@ export class ApplicationFormComponent extends UnsubscribeComponent implements On
   }
 
   getStatus(controlName: string): string {
-    const formControl = this.applicationForm.get(controlName)!;
-
     if (controlName === 'tags') {
       if (this.tags.size < 1 || this.tags.size > 5) {
         return 'danger';
@@ -161,6 +137,7 @@ export class ApplicationFormComponent extends UnsubscribeComponent implements On
       }
     }
 
+    const formControl = this.applicationForm.get(controlName)!;
     if (formControl.valid) {
       return 'success';
     } else if (formControl.value === '') {
@@ -180,5 +157,13 @@ export class ApplicationFormComponent extends UnsubscribeComponent implements On
       return this.applicationForm.invalid || this.tags.size < 1 || this.tags.size > 5;
     }
     return this.applicationForm.invalid;
+  }
+
+  #getOrganizationsByCity(city: string): string[] {
+    return this.organizationsService.getOrganizationsByCity(city);
+  }
+
+  #getCities(): string[] {
+    return this.organizationsService.getCities();
   }
 }

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ApplicationType } from '../../components/report-form/application-form.component';
-import { ApplicationForm } from './behavior-subject.service';
 
 @Injectable({
   providedIn: 'root',
