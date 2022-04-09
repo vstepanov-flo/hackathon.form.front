@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { catchError, of, tap } from 'rxjs';
+import { ApiService } from '../../shared/services/api.service';
+import { ToastrService } from '../../shared/services/toastr.service';
 
 @Component({
   selector: 'app-email-approval',
@@ -16,13 +19,34 @@ export class EmailApprovalComponent implements OnInit {
       Validators.maxLength(6)]),
   });
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private apiService: ApiService,
+    private toastrService: ToastrService,
+  ) {
   }
 
   ngOnInit(): void {
+    const email = this.route.snapshot.queryParamMap.get('email')!;
+    this.apiService.getCodeForEmailVerify(
+      email
+    )
+      .subscribe();
   }
 
   onSendCode(): void {
-    this.router.navigate(['/success'])
+    const code = this.emailVerifyForm.value.code;
+    this.apiService.sendVerifyCode(code)
+      .pipe(
+        tap(() => {
+          this.router.navigate(['/success']).then();
+        }),
+        catchError((error) => {
+          this.toastrService.showError(error);
+          return of(error);
+        })
+      )
+      .subscribe()
   }
 }
