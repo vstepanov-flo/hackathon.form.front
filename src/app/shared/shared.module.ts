@@ -1,22 +1,23 @@
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NbToastrModule } from '@nebular/theme';
+import { NbCardModule, NbToastrModule } from '@nebular/theme';
 import { FootnoteComponent } from './components/footnote/footnote.component';
 
 
 
 @NgModule({
   declarations: [
-    FootnoteComponent
+    FootnoteComponent,
   ],
   imports: [
     CommonModule,
     HttpClientModule,
     NbToastrModule.forRoot(),
+    NbCardModule,
   ],
   exports: [
-    FootnoteComponent
+    FootnoteComponent,
   ],
 })
 export class SharedModule { }

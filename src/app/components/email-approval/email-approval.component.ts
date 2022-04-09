@@ -22,6 +22,7 @@ export class EmailApprovalComponent extends UnsubscribeComponent implements OnIn
   });
 
   private form: ApplicationForm;
+  private file: FormData;
 
   constructor(
     private router: Router,
@@ -44,6 +45,13 @@ export class EmailApprovalComponent extends UnsubscribeComponent implements OnIn
       .subscribe((form) => {
         this.form = form;
       })
+
+    this.behaviourSubject.selectedFile
+      .pipe(takeUntil(this.unsubscribe))
+      .subscribe((file) => {
+        this.file = new FormData();
+        this.file.append('file', file);
+      })
   }
 
   onSendCode(): void {
@@ -52,8 +60,14 @@ export class EmailApprovalComponent extends UnsubscribeComponent implements OnIn
       .pipe(
         tap(async () => {
           // await lastValueFrom(this.apiService.sendApplication())
-          lastValueFrom(this.apiService.sendApplication(this.form)).then();
-          this.router.navigate(['/success']).then();
+          try {
+            await lastValueFrom(this.apiService.sendApplication(this.form)).then();
+            await lastValueFrom(this.apiService.sendFile(this.file)).then()
+            this.router.navigate(['/success']).then();
+          } catch (error) {
+            console.log(error);
+            this.toastrService.showError(error as HttpErrorResponse);
+          }
         }),
         catchError((error) => {
           this.toastrService.showError(error);

@@ -139,7 +139,7 @@ export class ApplicationFormComponent implements OnInit {
 
     if (event.target.files.length > 0) {
       const file = event.target.files[0];
-      console.log(file);
+      this.formFile = file;
       this.applicationForm.patchValue({
         file: file.name,
       });

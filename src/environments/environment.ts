@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  ipgeolocationApiKey: '6afebe20a77848e996c1e31deac91dfe'
+  ipgeolocationApiKey: '6afebe20a77848e996c1e31deac91dfe',
+  apiUrl: 'https://',
 };
 
 /*

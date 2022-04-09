@@ -20,19 +20,23 @@ export class ApiService {
   }
 
   public getCityInfo(): Observable<any> {
-    return this.#get('')
+    return this.#get(`${environment.apiUrl}`)
   }
 
   public getCodeForEmailVerify(email: string): Observable<void> {
-    return this.#post('http://ipinfo.io/', { email })
+    return this.#post(`${environment.apiUrl}`, { email })
   }
 
   public sendVerifyCode(code: string): Observable<void> {
-    return this.#post('http://123', { code });
+    return this.#post(`${environment.apiUrl}`, { code });
   }
 
   public sendApplication(body: ApplicationForm): Observable<void> {
-    return this.#post('http://321', body);
+    return this.#post(`${environment.apiUrl}`, body);
+  }
+
+  public sendFile(fileFormData: FormData): Observable<void> {
+    return this.#post(`${environment.apiUrl}`, fileFormData)
   }
 
   #get<T>(url:string, params?: ObjectType): Observable<T> {
