@@ -3,8 +3,8 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, lastValueFrom, of, takeUntil, tap } from 'rxjs';
 import { UnsubscribeComponent } from '../../shared/components/unsubscribe/unsubscribe.component';
-import { ApiService, ObjectType } from '../../shared/services/api.service';
-import { BehaviorSubjectService } from '../../shared/services/behavior-subject.service';
+import { ApiService } from '../../shared/services/api.service';
+import { ApplicationForm, BehaviorSubjectService } from '../../shared/services/behavior-subject.service';
 import { ToastrService } from '../../shared/services/toastr.service';
 
 @Component({
@@ -21,7 +21,7 @@ export class EmailApprovalComponent extends UnsubscribeComponent implements OnIn
       Validators.maxLength(6)]),
   });
 
-  private form: ObjectType;
+  private form: ApplicationForm;
 
   constructor(
     private router: Router,
@@ -39,7 +39,7 @@ export class EmailApprovalComponent extends UnsubscribeComponent implements OnIn
       email
     ).subscribe();
 
-    this.behaviourSubject.selectedRequests
+    this.behaviourSubject.selectedForm
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((form) => {
         this.form = form;
@@ -51,8 +51,8 @@ export class EmailApprovalComponent extends UnsubscribeComponent implements OnIn
     this.apiService.sendVerifyCode(code)
       .pipe(
         tap(async () => {
-          // await lastValueFrom(this.apiService.sendReport())
-          lastValueFrom(this.apiService.sendReport(this.form)).then();
+          // await lastValueFrom(this.apiService.sendApplication())
+          lastValueFrom(this.apiService.sendApplication(this.form)).then();
           this.router.navigate(['/success']).then();
         }),
         catchError((error) => {

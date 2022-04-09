@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { ApplicationForm } from './behavior-subject.service';
 
 export interface ObjectType {
   [k:string]: string;
@@ -30,7 +31,7 @@ export class ApiService {
     return this.#post('http://123', { code });
   }
 
-  public sendReport(body: ObjectType): Observable<void> {
+  public sendApplication(body: ApplicationForm): Observable<void> {
     return this.#post('http://321', body);
   }
 

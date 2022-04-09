@@ -14,7 +14,7 @@ import {
   NbCardModule, NbSelectModule, NbTagModule, NbAutocompleteModule, NbButtonModule,
 } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
-import { ReportFormComponent } from './components/report-form/report-form.component';
+import { ApplicationFormComponent } from './components/report-form/application-form.component';
 import { EmailApprovalComponent } from './components/email-approval/email-approval.component';
 import { SuccessPageComponent } from './components/success-page/success-page.component';
 import { SharedModule } from './shared/shared.module';
@@ -22,7 +22,7 @@ import { SharedModule } from './shared/shared.module';
 @NgModule({
   declarations: [
     AppComponent,
-    ReportFormComponent,
+    ApplicationFormComponent,
     EmailApprovalComponent,
     SuccessPageComponent,
   ],

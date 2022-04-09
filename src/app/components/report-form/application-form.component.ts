@@ -6,51 +6,54 @@ import { lastValueFrom, Observable, of } from 'rxjs';
 import { ApiService } from '../../shared/services/api.service';
 import { BehaviorSubjectService } from '../../shared/services/behavior-subject.service';
 
+export type OptionsTags = {
+  [k in TagName]: string[];
+};
+
+export type TagName = 'complaint' | 'feedback';
+
+export interface CitiesInfo {
+  [k: string]: CityInfo;
+}
+
+export interface CityInfo {
+  name: string;
+  institution: string[];
+}
+
 @Component({
-  selector: 'app-report-form',
-  templateUrl: './report-form.component.html',
-  styleUrls: ['./report-form.component.scss']
+  selector: 'app-application-form',
+  templateUrl: './application-form.component.html',
+  styleUrls: ['./application-form.component.scss']
 })
-export class ReportFormComponent implements OnInit {
-  // @ts-ignore
+export class ApplicationFormComponent implements OnInit {
+
   @ViewChild(NbTagInputDirective, { read: ElementRef }) tagInput: ElementRef<HTMLInputElement>;
-  fields: string[] = [
-    'email',
-    'city',
-    'institution',
-    'reportType',
-    'tags',
-    'name',
-    'surname',
-    'patronymic',
-    'reportText',
-    'file',
-  ];
   tags: Set<string> = new Set<string>();
-  optionsTags: {[k:string]: string[]};
+  optionsTags: OptionsTags;
 
-  reportType: string = 'feedback';
+  selectedApplicationType: TagName = 'feedback';
 
-  //TODO change type
-  city: any = [];
-  cityInfo: any;
-  mappedCityInfo: any = {};
-  selectedCity: any;
-  filteredCityOptions$: Observable<string[]>;
+  city: string[] = [];
+  mappedCitiesInfo: CitiesInfo = {};
+  selectedCity: CityInfo;
+  filteredCitiesOptions$: Observable<string[]>;
 
   institution: string[];
-  filteredInstitutionOptions$: Observable<string[]>;
+  filteredInstitutionsOptions$: Observable<string[]>;
 
-  public reportForm: FormGroup = new FormGroup({
+  formFile: File;
+
+  public applicationForm: FormGroup = new FormGroup({
     email: new FormControl('',  [Validators.required, Validators.email]),
     city: new FormControl('',  [Validators.required]),
     institution: new FormControl('',  [Validators.required]),
-    reportType: new FormControl('',  [Validators.required]),
+    applicationType: new FormControl('',  [Validators.required]),
     tags: new FormControl('',  []),
     name: new FormControl('',  [Validators.required]),
     surname: new FormControl('',  [Validators.required]),
     patronymic: new FormControl('',  []),
-    reportText: new FormControl('',  [
+    applicationText: new FormControl('',  [
       Validators.required,
       Validators.minLength(1),
       Validators.maxLength(2048)]),
@@ -65,7 +68,7 @@ export class ReportFormComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     const { city: clientCity } = await lastValueFrom(of({ city: 'Krasnodar' }));
-    this.cityInfo = await lastValueFrom(of({
+    const citiesInfo: CitiesInfo = await lastValueFrom(of({
       Krasnodar: {
         name: 'Краснодар',
         institution: ['Краснодар ул. Ставропольская'],
@@ -80,68 +83,80 @@ export class ReportFormComponent implements OnInit {
       feedback: ['1','2','3'],
     }))
 
-    for (const city in this.cityInfo) {
-      this.city.push(this.cityInfo[city].name)
+    for (const city in citiesInfo) {
+      this.city.push(citiesInfo[city].name)
       if (clientCity) {
-        this.selectedCity = this.cityInfo[clientCity];
-        this.institution = this.cityInfo[clientCity].institution;
-        this.filteredInstitutionOptions$ = of(this.institution);
-        this.reportForm.patchValue({ city: this.cityInfo[clientCity].name });
+        this.selectedCity = citiesInfo[clientCity];
+        this.institution = citiesInfo[clientCity].institution;
+        this.filteredInstitutionsOptions$ = of(this.institution);
+        this.applicationForm.patchValue({ city: citiesInfo[clientCity].name });
       }
-      this.mappedCityInfo[this.cityInfo[city].name] = this.cityInfo[city];
+      this.mappedCitiesInfo[citiesInfo[city].name] = citiesInfo[city];
     }
 
-    this.filteredCityOptions$ = of(this.city);
+    this.filteredCitiesOptions$ = of(this.city);
 
-    this.reportForm.get('city')!.valueChanges.subscribe((city) => {
+    this.applicationForm.get('city')!.valueChanges.subscribe((city) => {
       //TODO change type
-      this.selectedCity = this.mappedCityInfo[city];
+      this.selectedCity = this.mappedCitiesInfo[city];
       if (this.selectedCity) {
-        this.filteredInstitutionOptions$ = of(this.selectedCity.institution);
+        this.filteredInstitutionsOptions$ = of(this.selectedCity.institution);
         this.institution = this.selectedCity.institution;
       }
-      this.filteredCityOptions$ = of(this.city.filter((value: any) => {
+      this.filteredCitiesOptions$ = of(this.city.filter((value: any) => {
         const filterValue = city.toLowerCase();
         return value.toLowerCase().includes(filterValue);
       }))
     });
 
-    this.reportForm.get('institution')!.valueChanges.subscribe((institution) => {
-      this.filteredInstitutionOptions$ = of(this.institution.filter(value => {
+    this.applicationForm.get('institution')!.valueChanges.subscribe((institution) => {
+      this.filteredInstitutionsOptions$ = of(this.institution.filter(value => {
         const filterValue = institution.toLowerCase();
         return value.toLowerCase().includes(filterValue);
       }))
     });
 
-    this.reportForm.get('reportType')!.valueChanges.subscribe((tags) => {
+    this.applicationForm.get('applicationType')!.valueChanges.subscribe((tags) => {
       this.tags.clear();
     })
   }
 
-  onTagRemove(tagToRemove: NbTagComponent, tagsBlock: string): void {
+  onTagRemove(tagToRemove: NbTagComponent, tagsBlock: TagName): void {
     this.tags.delete(tagToRemove.text);
-    this.optionsTags[tagsBlock].push(tagToRemove.text);
+    // this.optionsTags[tagsBlock].push(tagToRemove.text);
   }
 
-  onTagAdd(value: string, tagsBlock: string): void {
+  onTagAdd(value: string, tagsBlock: TagName): void {
     if (value && this.optionsTags[tagsBlock].includes(value)) {
       this.tags.add(value);
-      this.optionsTags[tagsBlock] = this.optionsTags[tagsBlock].filter(o => o !== value);
+      // this.optionsTags[tagsBlock] = this.optionsTags[tagsBlock].filter(o => o !== value);
     }
     this.tagInput.nativeElement.value = '';
   }
 
+  onFileChange(event: any): void {
+    event.preventDefault();
+
+    if (event.target.files.length > 0) {
+      const file = event.target.files[0];
+      console.log(file);
+      this.applicationForm.patchValue({
+        file: file.name,
+      });
+    }
+  }
+
   onSubmit(): void {
-    this.reportForm.patchValue({ tags: [...this.tags]})
-    this.behaviourService.selectRequest(this.reportForm.value);
-    console.log(this.reportForm.value);
+    this.applicationForm.patchValue({ tags: [...this.tags]})
+    this.behaviourService.selectRequest(this.applicationForm.value);
+    console.log(this.applicationForm.value);
     this.router.navigate(['/email-verify'], {
-      queryParams: { email: this.reportForm.value.email },
+      queryParams: { email: this.applicationForm.value.email },
     }).then();
   }
 
   getStatus(controlName: string): string {
-    const formControl = this.reportForm.get(controlName)!;
+    const formControl = this.applicationForm.get(controlName)!;
 
     if (controlName === 'tags') {
       if (this.tags.size < 1) {
