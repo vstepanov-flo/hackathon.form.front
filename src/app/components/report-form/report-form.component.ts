@@ -132,6 +132,6 @@ export class ReportFormComponent implements OnInit {
   onSubmit(): void {
     this.reportForm.patchValue({ tags: [...this.tags]})
     console.log(this.reportForm.value);
-    this.router.navigate(['/email-verify']).then();
+    this.router.navigate(['/email-verify'], { queryParams: { email: this.reportForm.value.email } }).then();
   }
 }
