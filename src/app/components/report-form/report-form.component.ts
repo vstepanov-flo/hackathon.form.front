@@ -27,7 +27,7 @@ export class ReportFormComponent implements OnInit {
     'file',
   ];
   tags: Set<string> = new Set<string>();
-  optionsTags: {[k:string]: string[]}
+  optionsTags: {[k:string]: string[]};
 
   reportType: string = 'feedback';
 
@@ -138,5 +138,25 @@ export class ReportFormComponent implements OnInit {
     this.router.navigate(['/email-verify'], {
       queryParams: { email: this.reportForm.value.email },
     }).then();
+  }
+
+  getStatus(controlName: string): string {
+    const formControl = this.reportForm.get(controlName)!;
+
+    if (controlName === 'tags') {
+      if (this.tags.size < 1) {
+        return 'danger';
+      } else {
+        return 'success';
+      }
+    }
+
+    if (formControl.valid) {
+      return 'success';
+    } else if (formControl.value === '') {
+      return 'basic';
+    } else {
+      return 'danger';
+    }
   }
 }
