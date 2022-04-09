@@ -1,16 +1,18 @@
 <nb-card>
   <nb-card-header>Заявка</nb-card-header>
   <nb-card-body>
-    <form [formGroup]="applicationForm">
+    <form [formGroup]="getFormGroup(selectedApplicationType)">
 
       <nb-select fullWidth placeholder="Тип обращения" formControlName="applicationType"
                  status="{{getStatus('applicationType')}}"
                  [(selected)]="selectedApplicationType">
-        <nb-option class="form-input" [value]="'complaint'">Жалоба</nb-option>
-        <nb-option class="form-input" [value]="'feedback'">Отзыв</nb-option>
+        <nb-option class="form-input" value="complaint">Жалоба</nb-option>
+        <nb-option class="form-input" value="gratitude">Благодарность</nb-option>
+        <nb-option class="form-input" value="suggestion">Предложение</nb-option>
+        <nb-option class="form-input" value="question">Вопрос</nb-option>
       </nb-select>
 
-      <nb-form-field>
+      <nb-form-field *ngIf="selectedApplicationType === 'complaint'">
         <!--        <nb-icon nbPrefix icon="pricetags-outline" pack="eva"></nb-icon>-->
         <nb-tag-list (tagRemove)="onTagRemove($event, selectedApplicationType)">
           <nb-tag *ngFor="let tag of tags" [text]="tag" removable></nb-tag>
@@ -23,8 +25,8 @@
         <app-footnote [text]="'Должно содержать не менее одного тега'"></app-footnote>
       </nb-form-field>
       <nb-autocomplete #autocomplete (selectedChange)="onTagAdd($event, selectedApplicationType)">
-        <nb-option class="form-input" *ngFor="let option of optionsTags[selectedApplicationType]"
-                   [value]="option">{{ option }}</nb-option>
+          <nb-option class="form-input" *ngFor="let option of optionsTags[selectedApplicationType]"
+                     [value]="option">{{ option }}</nb-option>
       </nb-autocomplete>
 
       <nb-form-field>
@@ -91,7 +93,7 @@
         <app-footnote [text]="'Максимальное кол-во символов 2000'"></app-footnote>
       </nb-form-field>
 
-      <nb-form-field>
+      <nb-form-field *ngIf="selectedApplicationType === 'complaint'">
         <!--        <nb-icon nbPrefix icon="at-outline" pack="eva"></nb-icon>-->
         <input class="form-input"
                fullWidth type="file" nbInput formControlName="file" placeholder="Файл для отправки"
@@ -108,7 +110,7 @@
       <button (click)="onSubmit()"
               status="success"
               nbButton
-              [disabled]="applicationForm.invalid || tags.size < 1 || tags.size > 5">Отпрвить
+              [disabled]="isValidForm(selectedApplicationType)">Отпрвить
       </button>
     </form>
 

@@ -1,10 +1,11 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NbTagComponent, NbTagInputDirective } from '@nebular/theme';
 import { lastValueFrom, Observable, of } from 'rxjs';
 import { ApiService } from '../../shared/services/api.service';
 import { BehaviorSubjectService } from '../../shared/services/behavior-subject.service';
+import { FormGroupsService } from '../../shared/services/form-groups.service';
 
 export type OptionsTags = {
   [k in TagName]: string[];
@@ -44,27 +45,16 @@ export class ApplicationFormComponent implements OnInit {
 
   formFile: File;
 
-  public applicationForm: FormGroup = new FormGroup({
-    email: new FormControl('',  [Validators.required, Validators.email]),
-    city: new FormControl('',  [Validators.required]),
-    institution: new FormControl('',  [Validators.required]),
-    applicationType: new FormControl('',  [Validators.required]),
-    tags: new FormControl('',  []),
-    name: new FormControl('',  [Validators.required]),
-    surname: new FormControl('',  [Validators.required]),
-    patronymic: new FormControl('',  []),
-    applicationText: new FormControl('',  [
-      Validators.required,
-      Validators.minLength(1),
-      Validators.maxLength(2048)]),
-    file: new FormControl('',  []),
-  });
+  public applicationForm: FormGroup
 
   constructor(
     private router: Router,
     private apiService: ApiService,
     private behaviourService: BehaviorSubjectService,
-  ) { }
+    private formGroupService: FormGroupsService,
+  ) {
+    super();
+  }
 
   async ngOnInit(): Promise<void> {
     const { city: clientCity } = await lastValueFrom(of({ city: 'Krasnodar' }));
@@ -80,7 +70,6 @@ export class ApplicationFormComponent implements OnInit {
     }));
     this.optionsTags = await lastValueFrom(of({
       complaint: ['3','2','1'],
-      feedback: ['1','2','3'],
     }))
 
     for (const city in citiesInfo) {
@@ -173,5 +162,17 @@ export class ApplicationFormComponent implements OnInit {
     } else {
       return 'danger';
     }
+  }
+
+  public getFormGroup(applicationType: ApplicationType): FormGroup {
+    this.applicationForm = this.formGroupService.getFormGroup(applicationType);
+    return this.applicationForm;
+  }
+
+  public isValidForm(applicationType: ApplicationType): boolean {
+    if (applicationType === 'complaint') {
+      return this.applicationForm.invalid || this.tags.size < 1 || this.tags.size > 5;
+    }
+    return this.applicationForm.invalid;
   }
 }
