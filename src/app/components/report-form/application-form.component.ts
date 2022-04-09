@@ -3,15 +3,16 @@ import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NbTagComponent, NbTagInputDirective } from '@nebular/theme';
 import { lastValueFrom, Observable, of } from 'rxjs';
+import { UnsubscribeComponent } from '../../shared/components/unsubscribe/unsubscribe.component';
 import { ApiService } from '../../shared/services/api.service';
 import { BehaviorSubjectService } from '../../shared/services/behavior-subject.service';
 import { FormGroupsService } from '../../shared/services/form-groups.service';
 
 export type OptionsTags = {
-  [k in TagName]: string[];
+  [k: string]: string[];
 };
 
-export type TagName = 'complaint' | 'feedback';
+export type ApplicationType = 'complaint' | 'gratitude' | 'suggestion' | 'question';
 
 export interface CitiesInfo {
   [k: string]: CityInfo;
@@ -27,13 +28,13 @@ export interface CityInfo {
   templateUrl: './application-form.component.html',
   styleUrls: ['./application-form.component.scss']
 })
-export class ApplicationFormComponent implements OnInit {
+export class ApplicationFormComponent extends UnsubscribeComponent implements OnInit {
 
   @ViewChild(NbTagInputDirective, { read: ElementRef }) tagInput: ElementRef<HTMLInputElement>;
   tags: Set<string> = new Set<string>();
   optionsTags: OptionsTags;
 
-  selectedApplicationType: TagName = 'feedback';
+  selectedApplicationType: ApplicationType = 'complaint';
 
   city: string[] = [];
   mappedCitiesInfo: CitiesInfo = {};
@@ -110,14 +111,15 @@ export class ApplicationFormComponent implements OnInit {
     })
   }
 
-  onTagRemove(tagToRemove: NbTagComponent, tagsBlock: TagName): void {
+  onTagRemove(tagToRemove: NbTagComponent, tagsBlock: ApplicationType): void {
     this.tags.delete(tagToRemove.text);
     // this.optionsTags[tagsBlock].push(tagToRemove.text);
   }
 
-  onTagAdd(value: string, tagsBlock: TagName): void {
+  onTagAdd(value: string, tagsBlock: ApplicationType): void {
     if (value && this.optionsTags[tagsBlock].includes(value)) {
       this.tags.add(value);
+      this.applicationForm.patchValue({ tags: [...this.tags]})
       // this.optionsTags[tagsBlock] = this.optionsTags[tagsBlock].filter(o => o !== value);
     }
     this.tagInput.nativeElement.value = '';
@@ -136,9 +138,13 @@ export class ApplicationFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    this.applicationForm.patchValue({ tags: [...this.tags]})
-    this.behaviourService.selectRequest(this.applicationForm.value);
-    console.log(this.applicationForm.value);
+    if (this.applicationForm.get('tags')) {
+      this.applicationForm.patchValue({ tags: [...this.tags]})
+    }
+    if (this.applicationForm.get('file')) {
+      this.behaviourService.selectFile(this.formFile);
+    }
+    this.behaviourService.selectApplicationForm(this.applicationForm.value);
     this.router.navigate(['/email-verify'], {
       queryParams: { email: this.applicationForm.value.email },
     }).then();
@@ -148,7 +154,7 @@ export class ApplicationFormComponent implements OnInit {
     const formControl = this.applicationForm.get(controlName)!;
 
     if (controlName === 'tags') {
-      if (this.tags.size < 1) {
+      if (this.tags.size < 1 || this.tags.size > 5) {
         return 'danger';
       } else {
         return 'success';
