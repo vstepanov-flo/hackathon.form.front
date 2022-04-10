@@ -58,7 +58,7 @@ export class ApplicationFormComponent extends UnsubscribeComponent implements On
     this.cities = this.#getCities();
 
     this.optionsTags = await lastValueFrom(of({
-      complaint: ['3','2','1'],
+      complaint: ['скорость обслуживания','жалоба на сотрудника','некорректное общение', 'оскорбления', 'некорректные результаты работы'],
     }))
 
     this.filteredCitiesOptions$ = of(this.cities);
