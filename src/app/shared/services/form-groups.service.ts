@@ -10,15 +10,17 @@ export class FormGroupsService {
   private formControlFields = {
     email: new FormControl('', [Validators.required, Validators.email]),
     city: new FormControl('', [Validators.required]),
-    institution: new FormControl('', [Validators.required]),
-    applicationType: new FormControl('', [Validators.required]),
+    organization: new FormControl('', [Validators.required]),
+    type: new FormControl('', [Validators.required]),
     name: new FormControl('', [Validators.required]),
     surname: new FormControl('', [Validators.required]),
     patronymic: new FormControl('', []),
-    applicationText: new FormControl('', [
+    description: new FormControl('', [
       Validators.required,
       Validators.minLength(1),
       Validators.maxLength(2048)]),
+    organizationId: new FormControl('', []),
+    title: new FormControl('', [Validators.required]),
   }
 
   private complaint: FormGroup = new FormGroup({
