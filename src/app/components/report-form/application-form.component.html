@@ -3,8 +3,8 @@
   <nb-card-body>
     <form [formGroup]="getFormGroup(selectedApplicationType)">
 
-      <nb-select fullWidth placeholder="Тип обращения" formControlName="applicationType"
-                 status="{{getStatus('applicationType')}}"
+      <nb-select fullWidth placeholder="Тип обращения" formControlName="type"
+                 status="{{getStatus('type')}}"
                  [(selected)]="selectedApplicationType">
         <nb-option class="form-input" value="complaint">Жалоба</nb-option>
         <nb-option class="form-input" value="gratitude">Благодарность</nb-option>
@@ -22,12 +22,18 @@
                  [nbAutocomplete]="autocomplete">
         </nb-tag-list>
 
-        <app-footnote [text]="'Должно содержать не менее одного тега'"></app-footnote>
+        <app-footnote [text]="'Должно содержать не менее одного и не более 5 тегов'"></app-footnote>
       </nb-form-field>
       <nb-autocomplete #autocomplete (selectedChange)="onTagAdd($event, selectedApplicationType)">
           <nb-option class="form-input" *ngFor="let option of optionsTags[selectedApplicationType]"
                      [value]="option">{{ option }}</nb-option>
       </nb-autocomplete>
+
+      <nb-form-field>
+        <!--    <nb-icon nbPrefix icon="at-outline" pack="eva"></nb-icon>-->
+        <input class="form-input"
+               fullWidth type="text" nbInput formControlName="title" placeholder="Заголовок">
+      </nb-form-field>
 
       <nb-form-field>
         <input
@@ -48,13 +54,13 @@
 
       <nb-form-field>
         <input
-          formControlName="institution"
+          formControlName="organization"
           class="form-input"
           fullWidth
           nbInput
           type="text"
           placeholder="Учереждение"
-          status="{{getStatus('institution')}}"
+          status="{{getStatus('organization')}}"
           [nbAutocomplete]="autoControlInstitution"/>
       </nb-form-field>
       <nb-autocomplete #autoControlInstitution>
@@ -87,8 +93,8 @@
       <nb-form-field>
         <!--        <nb-icon nbPrefix icon="file-text-outline" pack="eva"></nb-icon>-->
         <textarea class="textarea"
-                  fullWidth fieldSize="giant" type="textarea" nbInput formControlName="applicationText"
-                  status="{{getStatus('applicationText')}}"
+                  fullWidth fieldSize="giant" type="textarea" nbInput formControlName="description"
+                  status="{{getStatus('description')}}"
                   placeholder="Текст обращения"></textarea>
         <app-footnote [text]="'Максимальное кол-во символов 2000'"></app-footnote>
       </nb-form-field>

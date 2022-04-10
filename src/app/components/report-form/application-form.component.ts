@@ -28,7 +28,7 @@ export class ApplicationFormComponent extends UnsubscribeComponent implements On
 
   selectedApplicationType: ApplicationType = 'complaint';
 
-  cities: string[] = [];
+  cities: string[];
   selectedCity: {
     city: string;
     organizations: string[];
@@ -53,7 +53,7 @@ export class ApplicationFormComponent extends UnsubscribeComponent implements On
   }
   //TODO Unmock request
   async ngOnInit(): Promise<void> {
-    // const { city: clientCity } = await lastValueFrom(of({ city: 'Krasnodar' }));
+    const { city: clientCity } = await lastValueFrom(of({ city: 'Krasnodar' }));
     await this.organizationsService.setOrganizationsCitiesInfo();
     this.cities = this.#getCities();
 
@@ -77,14 +77,14 @@ export class ApplicationFormComponent extends UnsubscribeComponent implements On
       }))
     });
 
-    this.applicationForm.get('institution')!.valueChanges.subscribe((institution) => {
+    this.applicationForm.get('organization')!.valueChanges.subscribe((institution) => {
       this.filteredInstitutionsOptions$ = of(this.institution.filter(value => {
         const filterValue = institution.toLowerCase();
         return value.toLowerCase().includes(filterValue);
       }))
     });
 
-    this.applicationForm.get('applicationType')!.valueChanges.subscribe((tags) => {
+    this.applicationForm.get('type')!.valueChanges.subscribe((tags) => {
       this.tags.clear();
     })
   }
@@ -122,6 +122,12 @@ export class ApplicationFormComponent extends UnsubscribeComponent implements On
     if (this.applicationForm.get('file')) {
       this.behaviourService.selectFile(this.formFile);
     }
+    this.applicationForm.patchValue({
+      organizationId: this.organizationsService.getOrganizationId(
+        this.applicationForm.value.city,
+        this.applicationForm.value.organization
+      )
+    });
     this.behaviourService.selectApplicationForm(this.applicationForm.value);
     this.router.navigate(['/email-verify'], {
       queryParams: { email: this.applicationForm.value.email },
