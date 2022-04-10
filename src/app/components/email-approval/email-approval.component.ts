@@ -57,14 +57,14 @@ export class EmailApprovalComponent extends UnsubscribeComponent implements OnIn
 
   onSendCode(): void {
     const code = this.emailVerifyForm.value.code;
+    const email = this.form.email;
     console.log(this.form, this.file);
-    this.apiService.sendVerifyCode(code)
+    this.apiService.sendVerifyCode(email, code)
       .pipe(
         tap(async () => {
-          // await lastValueFrom(this.apiService.sendApplication())
           try {
             await lastValueFrom(this.apiService.sendApplication(this.form)).then();
-            await lastValueFrom(this.apiService.sendFile(this.file)).then()
+            // await lastValueFrom(this.apiService.sendFile(this.file)).then()
             this.router.navigate(['/success']).then();
           } catch (error) {
             console.log(error);
@@ -73,8 +73,6 @@ export class EmailApprovalComponent extends UnsubscribeComponent implements OnIn
         }),
         catchError((error) => {
           this.toastrService.showError(error);
-          //TODO remove in prod
-          // this.router.navigate(['/success']).then();
           return of(error);
         })
       )
