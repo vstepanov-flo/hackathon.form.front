@@ -40,6 +40,8 @@ export class ApplicationFormComponent extends UnsubscribeComponent implements On
 
   formFile: File;
 
+  checked: boolean = false;
+
   public applicationForm: FormGroup
 
   constructor(
@@ -160,9 +162,20 @@ export class ApplicationFormComponent extends UnsubscribeComponent implements On
 
   public isValidForm(applicationType: ApplicationType): boolean {
     if (applicationType === 'complaint') {
-      return this.applicationForm.invalid || this.tags.size < 1 || this.tags.size > 5;
+      return this.applicationForm.invalid || this.tags.size < 1 || this.tags.size > 5 || !this.checked;
     }
-    return this.applicationForm.invalid;
+    return this.applicationForm.invalid || !this.checked;
+  }
+
+  public toggle(checked: boolean) {
+    this.checked = checked;
+  }
+
+  public toPersonalData(): void {
+    window.open(
+      'http://www.consultant.ru/document/cons_doc_LAW_61801/6c94959bc017ac80140621762d2ac59f6006b08c/',
+      '_blank'
+    );
   }
 
   #getOrganizationsByCity(city: string): string[] {

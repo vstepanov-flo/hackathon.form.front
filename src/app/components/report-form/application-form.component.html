@@ -113,6 +113,12 @@
                status="{{getStatus('email')}}">
       </nb-form-field>
 
+      <div class="toggle">
+        <nb-checkbox (checkedChange)="toggle($event)">Я согласен на обработку
+          <span class="url" (click)="toPersonalData()">персональных данных</span>
+        </nb-checkbox>
+      </div>
+
       <button (click)="onSubmit()"
               status="success"
               nbButton

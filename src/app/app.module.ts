@@ -11,7 +11,7 @@ import {
   NbIconModule,
   NbFormFieldModule,
   NbInputModule,
-  NbCardModule, NbSelectModule, NbTagModule, NbAutocompleteModule, NbButtonModule,
+  NbCardModule, NbSelectModule, NbTagModule, NbAutocompleteModule, NbButtonModule, NbCheckboxModule,
 } from '@nebular/theme';
 import { NbEvaIconsModule } from '@nebular/eva-icons';
 import { ApplicationFormComponent } from './components/report-form/application-form.component';
@@ -42,7 +42,8 @@ import { SharedModule } from './shared/shared.module';
     NbTagModule,
     NbAutocompleteModule,
     NbButtonModule,
-    SharedModule
+    SharedModule,
+    NbCheckboxModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
