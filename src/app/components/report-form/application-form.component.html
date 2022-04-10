@@ -3,38 +3,6 @@
   <nb-card-body>
     <form [formGroup]="getFormGroup(selectedApplicationType)">
 
-      <nb-select fullWidth placeholder="Тип обращения" formControlName="type"
-                 status="{{getStatus('type')}}"
-                 [(selected)]="selectedApplicationType">
-        <nb-option class="form-input" value="complaint">Жалоба</nb-option>
-        <nb-option class="form-input" value="gratitude">Благодарность</nb-option>
-        <nb-option class="form-input" value="suggestion">Предложение</nb-option>
-        <nb-option class="form-input" value="question">Вопрос</nb-option>
-      </nb-select>
-
-      <nb-form-field *ngIf="selectedApplicationType === 'complaint'">
-        <!--        <nb-icon nbPrefix icon="pricetags-outline" pack="eva"></nb-icon>-->
-        <nb-tag-list (tagRemove)="onTagRemove($event, selectedApplicationType)">
-          <nb-tag *ngFor="let tag of tags" [text]="tag" removable></nb-tag>
-          <input class="form-input"
-                 status="{{getStatus('tags')}}"
-                 placeholder="Теги" fullWidth type="text" nbTagInput (tagAdd)="onTagAdd($event.value, selectedApplicationType)"
-                 [nbAutocomplete]="autocomplete">
-        </nb-tag-list>
-
-        <app-footnote [text]="'Должно содержать не менее одного и не более 5 тегов'"></app-footnote>
-      </nb-form-field>
-      <nb-autocomplete #autocomplete (selectedChange)="onTagAdd($event, selectedApplicationType)">
-          <nb-option class="form-input" *ngFor="let option of optionsTags[selectedApplicationType]"
-                     [value]="option">{{ option }}</nb-option>
-      </nb-autocomplete>
-
-      <nb-form-field>
-        <!--    <nb-icon nbPrefix icon="at-outline" pack="eva"></nb-icon>-->
-        <input class="form-input"
-               fullWidth type="text" nbInput formControlName="title" placeholder="Заголовок">
-      </nb-form-field>
-
       <nb-form-field>
         <input
           formControlName="city"
@@ -68,6 +36,38 @@
           {{ option }}
         </nb-option>
       </nb-autocomplete>
+
+      <nb-select fullWidth placeholder="Тип обращения" formControlName="type"
+                 status="{{getStatus('type')}}"
+                 [(selected)]="selectedApplicationType">
+        <nb-option class="form-input" value="complaint">Жалоба</nb-option>
+        <nb-option class="form-input" value="gratitude">Благодарность</nb-option>
+        <nb-option class="form-input" value="suggestion">Предложение</nb-option>
+        <nb-option class="form-input" value="question">Вопрос</nb-option>
+      </nb-select>
+
+      <nb-form-field *ngIf="selectedApplicationType === 'complaint'">
+        <!--        <nb-icon nbPrefix icon="pricetags-outline" pack="eva"></nb-icon>-->
+        <nb-tag-list (tagRemove)="onTagRemove($event, selectedApplicationType)">
+          <nb-tag *ngFor="let tag of tags" [text]="tag" removable></nb-tag>
+          <input class="form-input"
+                 status="{{getStatus('tags')}}"
+                 placeholder="Теги" fullWidth type="text" nbTagInput (tagAdd)="onTagAdd($event.value, selectedApplicationType)"
+                 [nbAutocomplete]="autocomplete">
+        </nb-tag-list>
+
+        <app-footnote [text]="'Должно содержать не менее одного и не более 5 тегов'"></app-footnote>
+      </nb-form-field>
+      <nb-autocomplete #autocomplete (selectedChange)="onTagAdd($event, selectedApplicationType)">
+          <nb-option class="form-input" *ngFor="let option of optionsTags[selectedApplicationType]"
+                     [value]="option">{{ option }}</nb-option>
+      </nb-autocomplete>
+
+      <nb-form-field>
+        <!--    <nb-icon nbPrefix icon="at-outline" pack="eva"></nb-icon>-->
+        <input class="form-input"
+               fullWidth type="text" nbInput formControlName="title" placeholder="Заголовок">
+      </nb-form-field>
 
       <nb-form-field>
         <!--    <nb-icon nbPrefix icon="at-outline" pack="eva"></nb-icon>-->
