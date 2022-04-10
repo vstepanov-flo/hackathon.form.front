@@ -162,7 +162,7 @@ export class ApplicationFormComponent extends UnsubscribeComponent implements On
 
   public isValidForm(applicationType: ApplicationType): boolean {
     if (applicationType === 'complaint') {
-      return this.applicationForm.invalid || this.tags.size < 1 || this.tags.size > 5 || !this.checked;
+      return (this.applicationForm.invalid || this.tags.size < 1 || this.tags.size > 5) || !this.checked;
     }
     return this.applicationForm.invalid || !this.checked;
   }
