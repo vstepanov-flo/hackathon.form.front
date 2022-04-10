@@ -2,19 +2,20 @@ import { Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { ApiService } from './api.service';
 
-export interface CitiesInfo {
-  [k: string]: OrganizationInfo[];
+export interface Cities {
+  [k: string]: Organization[];
 }
 
-export interface CityInfo {
+export interface City {
   city: string;
-  organizations: OrganizationInfo[];
+  organizations: Organization[];
 }
 
-export interface OrganizationInfo {
+export interface Organization {
   address: string;
   fullName: string;
   type: string;
+  organizationId: number;
 }
 
 @Injectable({
@@ -22,7 +23,7 @@ export interface OrganizationInfo {
 })
 export class OrganizationCacheService {
 
-  private citiesInfoCache: CitiesInfo;
+  private citiesInfoCache: Cities;
   private cities: string[] = [];
 
   constructor(
@@ -35,6 +36,12 @@ export class OrganizationCacheService {
      })
   }
 
+  public getOrganizationId(city: string, organization: string): number {
+    return this.citiesInfoCache[city].find((cityInfo) => {
+      return `${cityInfo.fullName} ${cityInfo.address}` === organization;
+    })!.organizationId
+  }
+
   public getCities(): string[] {
     return this.cities;
   }
@@ -43,7 +50,7 @@ export class OrganizationCacheService {
     if (this.citiesInfoCache) {
       return;
     }
-    const citiesInfo: CityInfo[] = await lastValueFrom(this.apiService.getCitiesInfo());
+    const citiesInfo: City[] = await lastValueFrom(this.apiService.getCitiesInfo());
     this.citiesInfoCache = {};
     citiesInfo.forEach((cityInfo) => {
       this.citiesInfoCache[cityInfo.city] = cityInfo.organizations;
